@@ -102,24 +102,40 @@ function VehicleSearch() {
       })
     : [];
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search..."
-      />
-      <select
-        value={selectedItem}
-        onChange={(e) => setSelectedItem(e.target.value)}
-      >
-        {filteredItems.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.naming.make + " " + item.naming.model}
-          </option>
-        ))}
-      </select>
+      <div className="input-container">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search Vehicle..."
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        />
+      </div>
+
+      <div className="input-container">
+        {dropdownOpen && (
+          <span className="dropdown-content">
+            {filteredItems.map((item) => (
+              <span
+                className="dropdown-content-unit"
+                key={item.id}
+                onClick={() => setSelectedItem(item.id)}
+              >
+                <img
+                  className="thumbnail"
+                  src={item.media.image.thumbnail_url}
+                  alt={item.naming.make + " " + item.naming.model}
+                />
+                {item.naming.make + " " + item.naming.model}
+              </span>
+            ))}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -153,7 +169,6 @@ function TopBar({ route, range, setRange }) {
 
   return (
     <div>
-      {" "}
       <div className="input-container">
         <label htmlFor="range">Range:</label>
         <input

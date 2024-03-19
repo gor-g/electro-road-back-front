@@ -27,3 +27,31 @@
     margin: 5px;
     padding: 3px 10px;
 }
+
+.input-container li {
+    list-style: none;
+    margin: 5px;
+    padding: 3px 10px;
+    height: auto;
+    background-color: rgba(140, 220, 179, 0.708);
+    border-radius: 5px;
+}
+
+.thumbnail {
+    width: 200px;
+    height: auto;
+}
+
+.dropdown-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.dropdown-content-unit {
+    margin: 5px;
+    padding: 3px 10px;
+    background-color: rgba(140, 220, 179, 0.708);
+    width: auto;
+    border-radius: 5px;
+}
