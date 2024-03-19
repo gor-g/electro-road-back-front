@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 import { getRoute } from "./route";
+import { getVehicleList } from "./vehicle";
 import "leaflet-search";
 import "leaflet-search/dist/leaflet-search.min.css";
 import "./App.css";
@@ -74,6 +75,55 @@ function Route({ positions }) {
   return null;
 }
 
+function VehicleSearch() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedItem, setSelectedItem] = useState(""); // Initialize as empty string
+  const [items, setItems] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const vl = await getVehicleList(searchTerm);
+      console.log("vl : ", vl.data.vehicleList);
+      setItems(vl.data.vehicleList);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []); // Add searchTerm as a dependency
+
+  const filteredItems = Array.isArray(items)
+    ? items.filter((item) => {
+        const model = item.naming.model.toLowerCase();
+        const make = item.naming.make.toLowerCase();
+        return (model + make).includes(searchTerm.toLowerCase());
+      })
+    : [];
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search..."
+      />
+      <select
+        value={selectedItem}
+        onChange={(e) => setSelectedItem(e.target.value)}
+      >
+        {filteredItems.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.naming.make + " " + item.naming.model}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 function TopBar({ route, range, setRange }) {
   const [speed, setSpeed] = useState(60);
   const [localRange, setLocalRange] = useState(range);
@@ -102,36 +152,40 @@ function TopBar({ route, range, setRange }) {
   }
 
   return (
-    <div className="input-container">
-      <label htmlFor="range">Range:</label>
-      <input
-        id="range"
-        type="number"
-        value={localRange}
-        onChange={(e) => setLocalRange(e.target.value)}
-        placeholder="Range"
-      />
-      <button onClick={() => setRange(localRange)}>Set Range</button>
-      <label htmlFor="speed">Speed:</label>
-      <input
-        id="speed"
-        type="number"
-        value={speed}
-        onChange={(e) => setSpeed(e.target.value)}
-        placeholder="Speed"
-      />
-      <label htmlFor="stopDuration">Stop Duration:</label>
-      <input
-        id="stopDuration"
-        type="number"
-        value={stopDuration}
-        onChange={(e) => setStopDuration(e.target.value)}
-        placeholder="Stop Duration"
-      />
-      <button onClick={fetchDuration}>Compute Duration</button>
-      <p>Total Stops: {nstops} </p>
-      <p>Total Distance: {distance} </p>
-      <p>Total Duration: {totalDuration}</p>
+    <div>
+      {" "}
+      <div className="input-container">
+        <label htmlFor="range">Range:</label>
+        <input
+          id="range"
+          type="number"
+          value={localRange}
+          onChange={(e) => setLocalRange(e.target.value)}
+          placeholder="Range"
+        />
+        <button onClick={() => setRange(localRange)}>Set Range</button>
+        <label htmlFor="speed">Speed:</label>
+        <input
+          id="speed"
+          type="number"
+          value={speed}
+          onChange={(e) => setSpeed(e.target.value)}
+          placeholder="Speed"
+        />
+        <label htmlFor="stopDuration">Stop Duration:</label>
+        <input
+          id="stopDuration"
+          type="number"
+          value={stopDuration}
+          onChange={(e) => setStopDuration(e.target.value)}
+          placeholder="Stop Duration"
+        />
+        <button onClick={fetchDuration}>Compute Duration</button>
+        <p>Total Stops: {nstops} </p>
+        <p>Total Distance: {distance} </p>
+        <p>Total Duration: {totalDuration}</p>
+      </div>
+      <VehicleSearch />
     </div>
   );
 }

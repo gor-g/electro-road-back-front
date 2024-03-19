@@ -1,8 +1,8 @@
 const vehicleListQuery = `
-query vehicleList {
+query vehicleList($search: String) {
   vehicleList(
     page: 0, 
-    size: 20
+    size: 20,
     search: $search
     ) {
     id
@@ -27,72 +27,34 @@ query vehicleList {
 `;
 
 const headers = {
+  "Content-Type": "application/json",
   "x-client-id": "5ed1175bad06853b3aa1e492",
   "x-app-id": "623998b2c35130073829b2d2",
 };
 
 async function getVehicleList(search) {
-  const vehicleListQueryObject = {
-    query: vehicleListQuery,
-    variables: { search },
-  };
-  const response = await fetch(process.env.REACT_APP_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(vehicleListQueryObject),
-  });
-  if (response.ok) {
+  try {
+    const vehicleListQueryObject = {
+      query: vehicleListQuery,
+      variables: { search },
+    };
+    const response = await fetch("https://api.chargetrip.io/graphql", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(vehicleListQueryObject),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status: ${response.status}`);
+    }
+
     const result = await response.json();
-    console.log("result : ", result);
+    console.log("GraphQL response:", result);
     return result;
-  } else {
-    throw new Error(`Request error: ${response.statusText}`);
+  } catch (error) {
+    console.error("GraphQL request error:", error.message);
+    throw error;
   }
 }
 
 export { getVehicleList };
-
-function VehicleSearch() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    // Replace with your API call
-    const response = await fetch("https://api.example.com/items");
-    const data = await response.json();
-    setItems(data);
-  };
-
-  const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  return (
-    <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search..."
-      />
-      <select
-        value={selectedItem}
-        onChange={(e) => setSelectedItem(e.target.value)}
-      >
-        {filteredItems.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-import { getVehicleList } from "./vehicle";

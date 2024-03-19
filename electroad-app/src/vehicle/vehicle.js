@@ -1,3 +1,0 @@
-class vehicle {
-  constructor(vehicleAPIResponse) {}
-}
