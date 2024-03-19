@@ -1,0 +1,4 @@
+PORT=4000
+HOST="localhost"
+
+MAX_ITERATIONS=20
